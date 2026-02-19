@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Spam Analysis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            /* Premium Violet/Slate Palette */
+            --primary: #7c3aed;
+            /* Violet-600 */
+            --primary-dark: #6d28d9;
+            /* Violet-700 */
+            --primary-light: #a78bfa;
+            /* Violet-400 */
+
+            --success: #10b981;
+            /* Emerald-500 */
+            --success-dark: #059669;
+            /* Emerald-600 */
+
+            --danger: #f43f5e;
+            /* Rose-500 */
+            --danger-dark: #e11d48;
+            /* Rose-600 */
+
+            --warning: #f59e0b;
+            /* Amber-500 */
+            --warning-dark: #b45309;
+            /* Amber-700 */
+
+            /* Sophisticated Gradients */
+            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+            --header-gradient: linear-gradient(to right, #7c3aed, #db2777);
+
+            /* Modern Neutrals */
+            --bg-color: #f8fafc;
+            /* Slate-50 */
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #1e293b;
+            /* Slate-900 */
+            --text-light: #64748b;
+            /* Slate-500 */
+
+            /* Glass & Depth */
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.8);
+            --card-border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 10% 0%, rgba(124, 58, 237, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 100%, rgba(219, 39, 119, 0.05) 0%, transparent 40%);
+            margin: 0;
+            padding: 40px;
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            padding: 20px 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: var(--glass-border);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 0;
+            letter-spacing: -0.03em;
+            background: var(--header-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .refresh-note {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .nav-btn {
+            background: white;
+            color: var(--text-main);
+            padding: 10px 24px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(107, 114, 128, 0.1);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            border: var(--glass-border);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Decorative circle in cards */
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: -20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            opacity: 0.08;
+            z-index: 0;
+        }
+
+        .stat-card.total::after {
+            background: var(--text-main);
+        }
+
+        .stat-card.spam::after {
+            background: var(--danger);
+        }
+
+        .stat-card.ham::after {
+            background: var(--success);
+        }
+
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card .value {
+            font-size: 38px;
+            font-weight: 800;
+            color: var(--text-main);
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card.spam .value {
+            color: var(--accent-purple);
+        }
+
+        .stat-card.ham .value {
+            color: var(--accent-green);
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            height: 380px;
+            border: var(--glass-border);
+        }
+
+        .chart-card h3 {
+            margin-top: 0;
+            font-size: 18px;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .recent-emails {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: var(--glass-border);
+        }
+
+        .recent-emails h3 {
+            margin-top: 0;
+            font-size: 18px;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 16px 20px;
+            background: #fff;
+            border-radius: 0;
+            font-size: 14px;
+        }
+
+        tr td:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        tr td:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        tr:hover td {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-spam {
+            background-color: rgba(244, 63, 94, 0.1);
+            color: var(--danger);
+        }
+
+        .status-ham {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        /* Spotlight Section Styles */
+        .spotlight-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+            border: var(--glass-border);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .spotlight-badge {
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-spam {
+            background: rgba(245, 158, 11, 0.15);
+            /* Amber/Yellow tint */
+            color: var(--warning-dark);
+        }
+
+        .badge-ham {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .spotlight-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+            gap: 30px;
+        }
+
+        .email-viewer {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            /* Slightly crisper border */
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01);
+            /* Subtler shadow */
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+            /* Ensure containment */
+        }
+
+        .email-meta {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #636e72;
+        }
+
+        .meta-row {
+            margin-bottom: 5px;
+        }
+
+        .email-body {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #2d3436;
+            white-space: pre-wrap;
+            word-break: break-word;
+            /* Force break on long words */
+            overflow-wrap: break-word;
+            /* Standard property */
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .spam-highlight {
+            background-color: var(--danger);
+            color: white;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .nlp-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-block {
+            background: #fdfdfd;
+            border: 1px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .panel-block h4 {
+            margin: 0 0 15px 0;
+            font-size: 14px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .keyword-tag {
+            background: rgba(99, 102, 241, 0.1);
+            /* Indigo tint */
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .entity-table {
+            width: 100%;
+            font-size: 13px;
+            border-spacing: 0 4px;
+        }
+
+        .entity-table th {
+            padding: 5px;
+            font-size: 11px;
+        }
+
+        .entity-table td {
+            padding: 8px;
+            background: #fff;
+            border: 1px solid #f5f5f5;
+        }
+
+        .ent-text {
+            font-weight: 600;
+            color: #2d3436;
+        }
+
+        .ent-label {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .label-ORG {
+            background: #dfe6e9;
+            color: #2d3436;
+        }
+
+        .label-MONEY {
+            background: #55efc4;
+            color: #006266;
+        }
+
+        .label-GPE {
+            background: #74b9ff;
+            color: #0984e3;
+        }
+
+        .label-DATE {
+            background: #a29bfe;
+            color: #6c5ce7;
+        }
+
+        .label-URL {
+            background: #fdcb6e;
+            color: #d35400;
+        }
+
+        .no-data {
+            font-size: 13px;
+            color: #b2bec3;
+            font-style: italic;
+        }
+
+        .entities-container {
+            max-height: 250px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 5px;
+            /* Space for scrollbar */
+        }
+
+        /* Custom Scrollbar for entities */
+        .entities-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .entities-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .entities-container::-webkit-scrollbar-thumb {
+            background: #dfe6e9;
+            border-radius: 4px;
+        }
+
+        .ent-text {
+            font-weight: 600;
+            color: #2d3436;
+            word-break: break-word;
+            max-width: 200px;
+            /* Prevent wide content from stretching */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div>
+            <h1>Spam Analysis Dashboard</h1>
+            <div class="refresh-note">Live Threat Intelligence</div>
+        </div>
+        <div>
+            <a href="#spam-distribution-section" class="nav-btn">Spam Distribution</a>
+            <a href="#monthly-trends-section" class="nav-btn">Monthly Trends</a>
+            <a href="/" class="nav-btn" style="background: rgba(255,255,255,0.5);">← Back to Home</a>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card total">
+            <h3>Analyzed Messages</h3>
+            <div class="value">{{ stats.total }}</div>
+        </div>
+        <div class="stat-card spam">
+            <h3>Spam Threat</h3>
+            <div class="value">{{ stats.spam }}</div>
+        </div>
+        <div class="stat-card ham">
+            <h3>Safe Inbox</h3>
+            <div class="value">{{ stats.ham }}</div>
+        </div>
+    </div>
+
+    <div class="chart-card" style="margin-bottom: 30px; height: auto;">
+        <div class="spotlight-section" style="margin: 0; box-shadow: none; border: none; padding: 0;">
+            <div class="section-header">
+                <h2>Analysis Spotlight</h2>
+                <div class="spotlight-badge {{ 'badge-spam' if spotlight.is_spam else 'badge-ham' }}">
+                    {{ "🚨 THREAT DETECTED" if spotlight.is_spam else "✅ CLEAN MESSAGE" }}
+                </div>
+            </div>
+
+            {% if spotlight %}
+            <div class="spotlight-grid">
+                <div class="email-viewer">
+                    <div class="email-meta">
+                        <div class="meta-row"><strong>Subject:</strong> {{ spotlight.subject }}</div>
+                        <div class="meta-row"><strong>From:</strong> {{ spotlight.sender }}</div>
+                    </div>
+                    <div class="email-body">{{ spotlight.highlighted_body | safe }}</div>
+                </div>
+
+                <div class="nlp-panel">
+                    <div class="panel-block">
+                        <h4>🔍 Explainability (Trigger Words)</h4>
+                        <div class="tags-container">
+                            {% for keyword in spotlight.keywords %}
+                            <span class="keyword-tag">{{ keyword }}</span>
+                            {% else %}
+                            <span class="no-data">No specific triggers found.</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="panel-block">
+                        <h4>🤖 Entity Extraction (NER)</h4>
+                        <div class="entities-container">
+                            {% if spotlight.entities %}
+                            <table class="entity-table">
+                                <thead>
+                                    <tr>
+                                        <th>Entity</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ent in spotlight.entities %}
+                                    <tr>
+                                        <td><span class="ent-label label-{{ ent.label }}">{{ ent.label }}</span></td>
+                                        <td class="ent-text">{{ ent.text }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <span class="no-data">No named entities detected.</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-spotlight">
+                No emails available for analysis.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="charts-container">
+        <div class="chart-card" id="spam-distribution-section">
+            <h3>Spam Distribution</h3>
+            <canvas id="spamHamChart"></canvas>
+        </div>
+        <div class="chart-card" id="monthly-trends-section">
+            <h3>Monthly Threat Trends</h3>
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+
+    <div class="recent-emails">
+        <h3>Recent Intercepts</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Sender</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for email in emails %}
+                <tr onclick="selectEmail({{ loop.index0 }})"
+                    style="cursor: pointer; transition: background-color 0.2s;">
+                    <td>{{ email.subject }}</td>
+                    <td>{{ email.sender }}</td>
+                    <td>
+                        <span class="status-badge {{ 'status-spam' if email.is_spam else 'status-ham' }}">
+                            {{ email.label }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="text-align: center; color: var(--text-light); padding: 40px;">No recent email
+                        data found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const recentEmails = {{ emails | tojson }};
+
+        async function selectEmail(index) {
+            const email = recentEmails[index];
+            if (!email) return;
+
+            // Scroll to Spotlight
+            const spotlightSection = document.querySelector('.spotlight-section');
+            if (spotlightSection) {
+                spotlightSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // Visual feedback
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(r => r.style.backgroundColor = '');
+            rows[index].style.backgroundColor = 'rgba(0,0,0,0.03)';
+
+            const viewer = document.querySelector('.email-viewer');
+            const badge = document.querySelector('.spotlight-badge');
+            const panel = document.querySelector('.nlp-panel');
+
+            // Set Loading State
+            viewer.querySelector('.email-body').innerHTML = '<div style="display:flex; justify-content:center; padding:30px; color:#b2bec3;">Analyzing content...</div>';
+
+            // Update Headers immediately
+            viewer.querySelector('.meta-row:nth-child(1)').innerHTML = `<strong>Subject:</strong> ${email.subject}`;
+            viewer.querySelector('.meta-row:nth-child(2)').innerHTML = `<strong>From:</strong> ${email.sender}`;
+
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: email.body })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // Update Badge
+                    if (data.is_spam) {
+                        badge.className = 'spotlight-badge badge-spam';
+                        badge.innerText = '🚨 THREAT DETECTED';
+                    } else {
+                        badge.className = 'spotlight-badge badge-ham';
+                        badge.innerText = '✅ CLEAN MESSAGE';
+                    }
+
+                    // Update Body
+                    viewer.querySelector('.email-body').innerHTML = data.highlighted_body;
+
+                    // Update Keywords
+                    const tagsContainer = panel.querySelector('.tags-container');
+                    if (data.keywords && data.keywords.length > 0) {
+                        tagsContainer.innerHTML = data.keywords.map(k => `<span class="keyword-tag">${k}</span>`).join('');
+                    } else {
+                        tagsContainer.innerHTML = '<span class="no-data">No specific triggers found.</span>';
+                    }
+
+                    // Update Entities
+                    const entitiesContainer = panel.querySelector('.entities-container');
+                    if (data.entities && data.entities.length > 0) {
+                        const rows = data.entities.map(ent => `
+                            <tr>
+                                <td><span class="ent-label label-${ent.label}">${ent.label}</span></td>
+                                <td class="ent-text">${ent.text}</td>
+                            </tr>
+                        `).join('');
+
+                        entitiesContainer.innerHTML = `
+                            <table class="entity-table">
+                                <thead>
+                                    <tr>
+                                        <th>Entity</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rows}
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        entitiesContainer.innerHTML = '<span class="no-data">No named entities detected.</span>';
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+                viewer.querySelector('.email-body').innerHTML = '<div style="color:red; text-align:center;">Analysis Failed</div>';
+            }
+        }
+
+        // Centralized Color Theme - Synced with CSS
+        const chartTheme = {
+            spam: {
+                start: '#f43f5e', // Rose-500
+                end: '#e11d48',   // Rose-600
+                bg: 'rgba(244, 63, 94, 0.1)'
+            },
+            ham: {
+                start: '#10b981', // Emerald-500
+                end: '#059669',   // Emerald-600
+                bg: 'rgba(16, 185, 129, 0.1)'
+            },
+            font: "'Inter', sans-serif",
+            text: '#64748b'       // Slate-500
+        };
+
+        // Common chart options
+        Chart.defaults.font.family = chartTheme.font;
+        Chart.defaults.color = chartTheme.text;
+
+        // Spam Distribution Chart (2D Flat Design)
+        var ctx = document.getElementById('spamHamChart').getContext('2d');
+
+        var spamHamChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Spam', 'Not Spam'],
+                datasets: [{
+                    data: [{{ stats.spam }}, {{ stats.ham }}],
+            backgroundColor: [chartTheme.spam.start, chartTheme.ham.start],
+            borderWidth: 0,
+            hoverOffset: 15
+        }]
+            },
+        options: {
+            responsive: true,
+                maintainAspectRatio: false,
+                    cutout: '60%', // Thicker donut
+                        rotation: -45, // Angled start
+                            layout: {
+                padding: 20
+            },
+            plugins: {
+                legend: {
+                    position: 'right',
+                        labels: {
+                        usePointStyle: true,
+                            font: { size: 14, weight: '600' },
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#2d3436',
+                            bodyColor: '#2d3436',
+                                borderColor: 'rgba(0,0,0,0.05)',
+                                    borderWidth: 1,
+                                        padding: 12,
+                                            cornerRadius: 8,
+                                                displayColors: true,
+                                                    callbacks: {
+                        label: function(context) {
+                            var label = context.label || '';
+                            var value = context.parsed;
+                            var total = context.chart._metasets[context.datasetIndex].total;
+                            var percentage = Math.round((value / total) * 100) + '%';
+                            return label + ': ' + value + ' (' + percentage + ')';
+                        }
+                    }
+                }
+            }
+        }
+        });
+
+        // Monthly Trends Chart (Simple Design)
+        var ctx2 = document.getElementById('trendChart').getContext('2d');
+
+        var trendChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_data.monthly_data.labels | tojson }},
+        datasets: [
+            {
+                label: 'Spam Threats',
+                data: {{ chart_data.monthly_data.datasets[0].data | tojson }},
+            backgroundColor: chartTheme.spam.start,
+            borderRadius: 4,
+            categoryPercentage: 0.6,
+            barPercentage: 0.8
+            },
+            {
+                label: 'Safe Emails',
+                data: {{ chart_data.monthly_data.datasets[1].data | tojson }},
+            backgroundColor: chartTheme.ham.start,
+            borderRadius: 4,
+            categoryPercentage: 0.6,
+            barPercentage: 0.8
+            }
+        ]
+            },
+        options: {
+            responsive: true,
+                maintainAspectRatio: false,
+                    layout: {
+                padding: {
+                    left: 10,
+                        right: 10,
+                            bottom: 30
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                        align: 'end',
+                            labels: { usePointStyle: true, boxWidth: 8 }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#2d3436',
+                            bodyColor: '#2d3436',
+                                borderColor: 'rgba(0,0,0,0.05)',
+                                    borderWidth: 1,
+                                        padding: 12,
+                                            cornerRadius: 8,
+                                                callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.raw;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                        grid: { borderDash: [5, 5], color: '#f0f0f0' },
+                    ticks: { precision: 0, font: { weight: '600' } },
+                    stacked: false
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { weight: '600' } }
+                }
+            }
+        }
+        });
+    </script>
+</body>
+
+</html>
