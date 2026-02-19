@@ -87,4 +87,84 @@ This project demonstrates practical implementation of **machine learning in real
 ---
 
 ## 📁 Project Structure
+Email-Spam-Detection/
+│
+├── data/
+│ └── spam.csv
+│
+├── models/
+│ └── spam_model.pkl
+│
+├── src/
+│ ├── preprocess.py
+│ ├── train.py
+│ └── predict.py
+│
+├── app.py
+└── README.md
 
+
+---
+
+## ⚙️ Installation & Setup
+
+### Prerequisites
+
+Python (3.8+)  
+pip  
+Git  
+
+---
+
+### Clone Repository
+
+```bash
+git clone https://github.com/Kalpesh0389/Email-Spam-Detection.git
+cd Email-Spam-Detection
+
+Install Dependencies
+pip install -r requirements.txt
+
+Run Application
+python app.py
+
+
+(or if using Streamlit)
+
+streamlit run app.py
+
+🌐 Environment Variables
+
+Create a .env file (if needed):
+
+MODEL_PATH=your_model_path
+
+📊 Model Performance
+
+Accuracy: ~95% (update with your result)
+
+High precision for spam detection
+
+🔮 Future Enhancements
+
+💬 Email integration (Gmail/Outlook)
+⭐ Advanced ML models (Deep Learning)
+📊 Analytics dashboard
+🌐 Web deployment
+🔔 Real-time spam alerts
+
+👨‍💻 Author - Kalpesh Remje
+
+Full Stack Developer | ML Enthusiastic | Java Development
+
+🔗 GitHub: https://github.com/Kalpesh0389
+
+📜 License
+
+This project is developed for educational purposes and is open for learning and improvement.
+
+<div align="center">
+
+⭐ If you like this project, don’t forget to star the repository! ⭐
+
+</div> ```
