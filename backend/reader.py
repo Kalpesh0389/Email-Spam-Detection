@@ -2,8 +2,8 @@ from imapclient import IMAPClient
 import pyzmail
 
 HOST = "imap.gmail.com"
-USERNAME = "kalpeshremje7@gmail.com"
-PASSWORD = "dvunrfbmsphuhhad"
+USERNAME = "your gmail"
+PASSWORD = "your password"
 
 def read_latest():
     server = IMAPClient(HOST)
