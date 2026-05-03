@@ -90,19 +90,18 @@ This project demonstrates practical implementation of **machine learning in real
 Email-Spam-Detection/
 │
 ├── data/
-│ └── spam.csv
+│   └── spam.csv
 │
 ├── models/
-│ └── spam_model.pkl
+│   └── spam_model.pkl
 │
 ├── src/
-│ ├── preprocess.py
-│ ├── train.py
-│ └── predict.py
+│   ├── preprocess.py
+│   ├── train.py
+│   └── predict.py
 │
 ├── app.py
 └── README.md
-
 
 ---
 
