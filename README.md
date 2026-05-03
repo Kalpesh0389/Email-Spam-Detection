@@ -87,6 +87,8 @@ This project demonstrates practical implementation of **machine learning in real
 ---
 
 ## 📁 Project Structure
+
+```
 Email-Spam-Detection/
 │
 ├── data/
@@ -102,7 +104,7 @@ Email-Spam-Detection/
 │
 ├── app.py
 └── README.md
-
+```
 ---
 
 ## ⚙️ Installation & Setup
