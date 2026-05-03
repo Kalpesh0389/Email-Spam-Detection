@@ -77,12 +77,12 @@ This project demonstrates practical implementation of **machine learning in real
 
 ## 🏗️ Tech Stack
 
-| Layer        | Technologies                     |
-|--------------|---------------------------------|
-| Language     | Python                          |
-| Libraries    | Scikit-learn, Pandas, NumPy     |
-| NLP          | NLTK                            |
-| Interface    | Streamlit / Flask *(if used)*   |
+| Layer     | Technologies                   |
+|-----------|-------------------------------|
+| Language  | Python                        |
+| Libraries | Scikit-learn, Pandas, NumPy   |
+| NLP       | NLTK                          |
+| Interface | Streamlit / Flask *(if used)* |
 
 ---
 
@@ -109,9 +109,9 @@ Email-Spam-Detection/
 
 ### Prerequisites
 
-Python (3.8+)  
-pip  
-Git  
+- Python (3.8+)
+- pip
+- Git
 
 ---
 
@@ -120,50 +120,68 @@ Git
 ```bash
 git clone https://github.com/Kalpesh0389/Email-Spam-Detection.git
 cd Email-Spam-Detection
+```
 
-Install Dependencies
+### Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-Run Application
+### Run Application
+
+```bash
 python app.py
+```
 
+*(or if using Streamlit)*
 
-(or if using Streamlit)
-
+```bash
 streamlit run app.py
+```
 
-🌐 Environment Variables
+---
 
-Create a .env file (if needed):
+## 🌐 Environment Variables
 
+Create a `.env` file (if needed):
 MODEL_PATH=your_model_path
 
-📊 Model Performance
+---
 
-Accuracy: ~95% (update with your result)
+## 📊 Model Performance
 
-High precision for spam detection
+- Accuracy: ~95% *(update with your result)*
+- High precision for spam detection
 
-🔮 Future Enhancements
+---
 
-💬 Email integration (Gmail/Outlook)
-⭐ Advanced ML models (Deep Learning)
-📊 Analytics dashboard
-🌐 Web deployment
-🔔 Real-time spam alerts
+## 🔮 Future Enhancements
 
-👨‍💻 Author - Kalpesh Remje
+* 💬 Email integration (Gmail/Outlook)
+* ⭐ Advanced ML models (Deep Learning)
+* 📊 Analytics dashboard
+* 🌐 Web deployment
+* 🔔 Real-time spam alerts
 
-Full Stack Developer | ML Enthusiastic | Java Development
+---
 
-🔗 GitHub: https://github.com/Kalpesh0389
+## 👨‍💻 Author - Kalpesh Remje
 
-📜 License
+**Full Stack Developer | ML Enthusiastic | Java Development**
+
+🔗 GitHub: [https://github.com/Kalpesh0389](https://github.com/Kalpesh0389)
+
+---
+
+## 📜 License
 
 This project is developed for educational purposes and is open for learning and improvement.
 
+---
+
 <div align="center">
 
-⭐ If you like this project, don’t forget to star the repository! ⭐
+⭐ If you like this project, don't forget to star the repository! ⭐
 
-</div> ```
+</div>
